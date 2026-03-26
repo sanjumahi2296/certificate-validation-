@@ -1,0 +1,71 @@
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+let certificates = [];
+
+app.post("/issue", (req, res) => {
+const cert = req.body;
+certificates.push(cert);
+res.send("Certificate Issued");
+});
+
+app.get("/verify/:id", (req, res) => {
+const cert = certificates.find(c => c.id === req.params.id);
+if (cert) res.json(cert);
+else res.send("Not Found");
+});
+
+    });
+}
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <title>Certificate Validation</title>
+</head>
+<body>
+
+<h2>Issue Certificate</h2>
+<input id="id" placeholder="Certificate ID"><br>
+<input id="name" placeholder="Student Name"><br>
+<input id="course" placeholder="Course"><br>
+<button onclick="issue()">Issue</button>
+
+<h2>Verify Certificate</h2>
+<input id="vid" placeholder="Certificate ID">
+<button onclick="verify()">Verify</button>
+
+<p id="result"></p>
+
+<script>
+function issue() {
+    fetch("http://localhost:3000/issue", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            id: document.getElementById("id").value,
+            name: document.getElementById("name").value,
+            course: document.getElementById("course").value
+        })
+    }).then(res => res.text()).then(alert);
+}
+
+function verify() {
+    let id = document.getElementById("vid").value;
+    fetch("http://localhost:3000/verify/" + id)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerText =
+            "Name: " + data.name + ", Course: " + data.course;
+    });
+}
+</script>
+
+</body>
+</html>
